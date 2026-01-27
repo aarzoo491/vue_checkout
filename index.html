@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+    <script>
+      (function () {
+        function loadVisiopt() {
+          delete window.visiopt_code;
+          delete window.visiopt_code_status;
+          const oldStyle = document.getElementById("visi_flicker");
+          if (oldStyle) oldStyle.remove();
+          window.visiopt_code = (function () {
+            var visi_wid = 1040,
+              visi_flicker_time = 4000,
+              visi_flicker_element = "html",
+              c = false,
+              d = document,
+              visi_fn = {
+                begin: function () {
+                  var a = d.getElementById("visi_flicker");
+                  if (!a) {
+                    a = d.createElement("style");
+                    var b =
+                      visi_flicker_element +
+                      "{opacity:0!important;background:none!important;}";
+                    a.id = "visi_flicker";
+                    a.type = "text/css";
+                    a.appendChild(d.createTextNode(b));
+                    document.head.appendChild(a);
+                  }
+                },
+                complete: function () {
+                  c = true;
+                  var a = d.getElementById("visi_flicker");
+                  if (a) a.remove();
+                },
+                pack: function (a) {
+                  const oldScript = document.querySelector(
+                    `script[src^="${a}"]`,
+                  );
+                  if (oldScript) oldScript.remove();
+                  const b = document.createElement("script");
+                  b.src = a;
+                  b.type = "text/javascript";
+                  b.onerror = function () {
+                    visi_fn.complete();
+                  };
+                  document.head.appendChild(b);
+                },
+                init: function () {
+                  visi_fn.begin();
+                  setTimeout(() => visi_fn.complete(), visi_flicker_time);
+                  visi_fn.pack(
+                    "https://visioptdev.com/client/js_test/vt." +
+                      visi_wid +
+                      "_1.js",
+                  );
+                  return true;
+                },
+              };
+            window.visiopt_code_status = visi_fn.init();
+            return visi_fn;
+          })();
+        }
+        let firstLoad = true;
+        let routeLock = false;
+        function onRouteChange() {
+          if (firstLoad) {
+            firstLoad = false;
+            return;
+          }
+          if (routeLock) return;
+          routeLock = true;
+          loadVisiopt();
+          setTimeout(() => {
+            routeLock = false;
+          }, 100);
+        }
+        const originalPushState = history.pushState;
+        history.pushState = function () {
+          originalPushState.apply(this, arguments);
+          onRouteChange();
+        };
+        const originalReplaceState = history.replaceState;
+        history.replaceState = function () {
+          originalReplaceState.apply(this, arguments);
+          onRouteChange();
+        };
+        window.addEventListener("popstate", onRouteChange);
+        window.addEventListener("load", loadVisiopt);
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
