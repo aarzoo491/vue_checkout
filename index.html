@@ -10,6 +10,17 @@
         function loadVisiopt() {
           delete window.visiopt_code;
           delete window.visiopt_code_status;
+          delete window.VisiOptSDK;
+          delete window.VisiVariationEngine;
+          delete window.VisiHeatmapEngine;
+          delete window.VisiScrollmapEngine;
+          delete window.VisiRecordingEngine;
+          delete window.VisiEmEngine;
+          delete window.VisioptConfig;
+          window._kx_called = false;
+          window._kx_tid = 0;
+          window.pageJson = null;
+          window.visi_rot_sts = 0;
           const oldStyle = document.getElementById("visi_flicker");
           if (oldStyle) oldStyle.remove();
           window.visiopt_code = (function () {
@@ -67,14 +78,18 @@
         }
         let firstLoad = true;
         let routeLock = false;
+        let lastPath = location.pathname;
         function onRouteChange() {
           if (firstLoad) {
             firstLoad = false;
+            lastPath = location.pathname;
             return;
           }
           if (routeLock) return;
+          if(lastPath == location.pathname) return;
           routeLock = true;
           loadVisiopt();
+          lastPath = location.pathname;
           setTimeout(() => {
             routeLock = false;
           }, 100);
@@ -90,7 +105,7 @@
           onRouteChange();
         };
         window.addEventListener("popstate", onRouteChange);
-        window.addEventListener("load", loadVisiopt);
+        loadVisiopt();
       })();
     </script>
   </head>
