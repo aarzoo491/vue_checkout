@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import axios from 'axios'
 
 const email = ref('')
 const amount = ref('')
@@ -74,17 +75,18 @@ const submitPayment = async () => {
   messageType.value = ''
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const response = await axios.post('https://visioptdev.com/app/webhook_capture_custom/MTA0MC00MjMtMTMzLVc=', {
+      email: email.value,
+      amount: amount.value
+    })
 
-    message.value = `Payment of $${amount.value} to ${email.value} submitted successfully!`
+    message.value = response.data?.message || 'Payment submitted successfully!'
     messageType.value = 'success'
 
-    // Reset form
     email.value = ''
     amount.value = ''
-  } catch (error) {
-    message.value = 'An error occurred. Please try again.'
+  } catch (error: any) {
+    message.value = error.response?.data?.message || 'Something went wrong. Please try again.'
     messageType.value = 'error'
   } finally {
     loading.value = false
