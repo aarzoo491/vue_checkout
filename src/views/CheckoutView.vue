@@ -75,10 +75,13 @@ const submitPayment = async () => {
   messageType.value = ''
 
   try {
-    const response = await axios.post('https://visioptdev.com/app/webhook_capture_custom/MTA0MC00MjMtMTMzLVc=', {
-      email: email.value,
-      amount: amount.value
-    })
+    const response = await axios.post(
+      "/.netlify/functions/pay-now",
+      {
+        email: email.value,
+        amount: amount.value
+      }
+    );
 
     message.value = response.data?.message || 'Payment submitted successfully!'
     messageType.value = 'success'
